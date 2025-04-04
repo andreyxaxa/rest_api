@@ -18,7 +18,7 @@ func init() {
 
 func main() {
 	config := apiserver.NewConfig()
-	_, err := toml.Decode(configPath, config)
+	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
