@@ -1,3 +1,4 @@
 bind_addr = ":8080"
 log_level = "debug"
 database_url = "postgres://postgres:123@localhost/rest_dev?sslmode=disable"
+session_key = "612738dasnqliqc198023890jdfjsdfksdlfn1n0uf2309f2npasdfmf23g34g34nglkfdjnlks1klmxcvz"
