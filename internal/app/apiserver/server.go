@@ -133,12 +133,12 @@ func (s *server) handleUsersDelete() http.HandlerFunc {
 		vars := mux.Vars(r)
 		userID, ok := vars["id"]
 		if !ok {
-			s.error(w, r, http.StatusBadRequest, errEmptyID)
+			s.error(w, r, http.StatusNotFound, errEmptyID)
 			return
 		}
 		id, err := strconv.Atoi(userID)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, errInvalidID)
+			s.error(w, r, http.StatusNotFound, errInvalidID)
 			return
 		}
 
@@ -147,7 +147,7 @@ func (s *server) handleUsersDelete() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, nil)
+		s.respond(w, r, http.StatusNoContent, nil)
 	}
 }
 

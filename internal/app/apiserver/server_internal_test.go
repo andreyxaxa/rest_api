@@ -172,18 +172,18 @@ func TestServer_HandleUsersDelete(t *testing.T) {
 		{
 			name:         "valid",
 			userID:       fmt.Sprintf("%d", u.ID),
-			expectedCode: http.StatusOK,
+			expectedCode: http.StatusNoContent,
 		},
 		// {
 		// 	name:         "user not found",
 		// 	userID:       "9999", // предполагаем, что такого юзера нет
-		// 	expectedCode: http.StatusBadRequest,
+		// 	expectedCode: http.StatusNotFound,
 		// },
-		// {
-		// 	name:         "invalid user ID",
-		// 	userID:       "invalid",
-		// 	expectedCode: http.StatusBadRequest,
-		// },
+		{
+			name:         "invalid user ID",
+			userID:       "invalid",
+			expectedCode: http.StatusNotFound,
+		},
 		{
 			name:         "missing user ID",
 			userID:       "",
