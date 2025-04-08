@@ -66,3 +66,21 @@ func (r *UserRepository) Find(id int) (*model.User, error) {
 
 	return u, nil
 }
+
+func (r *UserRepository) Delete(id int) error {
+	res, err := r.store.db.Exec("DELETE FROM users WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return store.ErrRecordNotFound
+	}
+
+	return nil
+}

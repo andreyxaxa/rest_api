@@ -43,3 +43,13 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 
 	return nil, store.ErrRecordNotFound
 }
+
+func (r *UserRepository) Delete(id int) error {
+	if _, ok := r.users[id]; !ok {
+		return store.ErrRecordNotFound
+	}
+
+	delete(r.users, id)
+
+	return nil
+}

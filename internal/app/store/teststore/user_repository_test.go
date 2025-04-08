@@ -45,3 +45,17 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 }
+
+func TestUserRepository_Delete(t *testing.T) {
+	s := teststore.New()
+
+	u1 := model.TestUser(t)
+	s.User().Create(u1)
+
+	err := s.User().Delete(u1.ID)
+	assert.NoError(t, err)
+
+	u2, err := s.User().Find(u1.ID)
+	assert.Error(t, err)
+	assert.Nil(t, u2)
+}

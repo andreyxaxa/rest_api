@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/andreyxaxa/rest_api/internal/app/model"
@@ -25,6 +26,8 @@ const (
 var (
 	errIncorrectEmailOrPassword = errors.New("incorrect email of password")
 	errNotAuthenticated         = errors.New("not authenticated")
+	errEmptyID                  = errors.New("user ID is required")
+	errInvalidID                = errors.New("invalid user ID")
 )
 
 type ctxKey int8
@@ -63,6 +66,7 @@ func (s *server) configureRouter() {
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.authenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
+	private.HandleFunc("/users/{id:[0-9]+}", s.handleUsersDelete()).Methods("DELETE")
 }
 
 func (s *server) setRequestID(next http.Handler) http.Handler {
@@ -121,6 +125,29 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 func (s *server) handleWhoami() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, r, http.StatusOK, r.Context().Value(ctxKeyUser).(*model.User))
+	}
+}
+
+func (s *server) handleUsersDelete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		userID, ok := vars["id"]
+		if !ok {
+			s.error(w, r, http.StatusBadRequest, errEmptyID)
+			return
+		}
+		id, err := strconv.Atoi(userID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, errInvalidID)
+			return
+		}
+
+		if err := s.store.User().Delete(id); err != nil {
+			s.error(w, r, http.StatusNotFound, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 

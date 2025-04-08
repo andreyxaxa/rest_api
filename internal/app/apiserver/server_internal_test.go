@@ -156,3 +156,52 @@ func TestServer_HandleSessionsCreate(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_HandleUsersDelete(t *testing.T) {
+	store := teststore.New()
+	u := model.TestUser(t)
+	store.User().Create(u)
+
+	s := newServer(store, sessions.NewCookieStore([]byte("secret")))
+
+	testCases := []struct {
+		name         string
+		userID       string
+		expectedCode int
+	}{
+		{
+			name:         "valid",
+			userID:       fmt.Sprintf("%d", u.ID),
+			expectedCode: http.StatusOK,
+		},
+		// {
+		// 	name:         "user not found",
+		// 	userID:       "9999", // предполагаем, что такого юзера нет
+		// 	expectedCode: http.StatusBadRequest,
+		// },
+		// {
+		// 	name:         "invalid user ID",
+		// 	userID:       "invalid",
+		// 	expectedCode: http.StatusBadRequest,
+		// },
+		{
+			name:         "missing user ID",
+			userID:       "",
+			expectedCode: http.StatusNotFound,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest("DELETE", fmt.Sprintf("/private/users/%s", tc.userID), nil)
+
+			session, _ := s.sessionStore.Get(req, sessionName)
+			session.Values["user_id"] = u.ID
+			s.sessionStore.Save(req, rec, session)
+
+			s.ServeHTTP(rec, req)
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+}

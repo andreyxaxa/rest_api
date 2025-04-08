@@ -54,3 +54,21 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 }
+
+func TestUserRepository_Delete(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown("users")
+
+	s := sqlstore.New(db)
+
+	u := model.TestUser(t)
+	s.User().Create(u)
+
+	err := s.User().Delete(u.ID + 1) // специально проверим на несуществующем
+	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
+
+	err = s.User().Delete(u.ID)
+	assert.NoError(t, err)
+	_, err = s.User().Find(u.ID)
+	assert.Error(t, err)
+}
