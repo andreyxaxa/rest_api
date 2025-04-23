@@ -1,6 +1,10 @@
-build - make;
+Build - make;
 
-test - make test.
+
+Run - `make docker.run`
+
+
+Test - make test.
 
 - create user - POST /users
 - read user - GET /private/whoami
